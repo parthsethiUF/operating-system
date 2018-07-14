@@ -1,0 +1,36 @@
+.\" Copyright (c) 2017 University of Florida.
+.\"
+.\"	@(#)set_tag.2	6.3 (Parth) 2017
+.\"
+.TH set_tag 2 "UF 2017"
+
+.SH NAME
+set_tag sets a tag for a process
+.SH SYNOPSIS
+.nf
+.ft B
+#include <unistd.h>
+
+int set_tag(int PID, int newvalue);
+.ft R
+.fi
+.SH DESCRIPTION
+The set_tag function sets the tag for a process, given the user is the root user
+rest of users can not set any tag.
+The PID is the process ID of the process whose tag is to be 
+accessed,
+the newValue is the tag that has to be set for the process with id 'PID' which
+is a non negative value.
+
+.RE
+.SH "RETURN VALUE
+Upon successful completion, a value of tag is returned though it is not needed.
+Otherwise, a value of \-1 is returned to indicate the error.
+.SH ERRORS
+set_tag() call will fail if the process ID refers to an invalid PID or
+the PID must refer to a live process.
+set_tag() call will also fail if the value is negative.  
+.SH "SEE ALSO"
+.BR get_tag (2)
+.SH AUTHOR
+Parth Sethi 

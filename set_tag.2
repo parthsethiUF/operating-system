@@ -1,0 +1,259 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fstream>
+#include<vector>
+#include <iostream>
+#include <string>
+using namespace std;
+// A Huffman tree node
+typedef struct MinHeapNode
+{
+    int data; 
+    int freq; 
+    struct MinHeapNode *left, *right; 
+} huffnode;
+
+// normal min heap priority queue
+typedef struct MinHeap
+{
+    int size;    
+    int capacity;   
+    struct MinHeapNode *array[1000003];  
+} min_heap;
+ 
+huffnode* newNode(int data, int fr)
+{
+    huffnode* t = new huffnode;
+    t->left = t->right = NULL;
+    t->data = data;
+    t->freq = fr;
+    return t;
+}
+
+min_heap* make_min_heap(int capacity)
+{
+	int i;
+    min_heap* minHeap = new min_heap;
+    minHeap->size = 3;  
+    minHeap->capacity = capacity;
+    return minHeap;
+}
+ 
+void swap_min_huffnode(huffnode** a, huffnode** b)
+{
+
+    huffnode* t = *a;
+    *a = *b;
+    *b = t;
+    
+}
+ 
+void heapify_min(min_heap* minHeap, int index)
+{
+
+    int smallest = index;//---------------------------------------------------------------
+    int leftl =  4 * index - 8;
+    int leftr =  4 * index - 7;
+    int rightl = 4 * index - 6;
+    int rightr = 4 * index - 5;
+    
+    //cout<<"in heapify min\nindex="<<index<<"leftl="<<leftl<<"lr="<<leftr<<"rl="<<rightl<<"rr="<<rightr<<"size="<<minHeap->size<<"\n";
+    if (leftl < minHeap->size && (minHeap->array[leftl]->freq < minHeap->array[smallest]->freq && minHeap->array[leftl]->freq < minHeap->array[leftr]->freq))
+      smallest = leftl;
+    if (leftr < minHeap->size && (minHeap->array[leftr]->freq < minHeap->array[smallest]->freq && minHeap->array[leftr]->freq < minHeap->array[leftl]->freq))
+      smallest = leftr;
+    if (rightr < minHeap->size && minHeap->array[rightr]->freq < minHeap->array[smallest]->freq &&  minHeap->array[rightr]->freq < minHeap->array[rightl]->freq)
+      smallest = rightr;
+    if (rightl < minHeap->size && minHeap->array[rightl]->freq < minHeap->array[smallest]->freq &&  minHeap->array[rightl]->freq < minHeap->array[rightr]->freq)
+      smallest = rightl;
+    //cout<<"smallest = "<<smallest<<"index="<<index<<"\n";
+    if (smallest != index)
+    {
+        swap_min_huffnode(&minHeap->array[smallest], &minHeap->array[index]);
+        heapify_min(minHeap, smallest);
+    }
+}
+
+ 
+huffnode* removemin(min_heap* minHeap)
+{
+    huffnode* temp = minHeap->array[3];
+    minHeap->array[3] = minHeap->array[minHeap->size - 1];
+    (minHeap->size)--;
+    heapify_min(minHeap, 3);
+    return temp;
+}
+ 
+void insert_min_heap(min_heap* minHeap, huffnode* minHeapNode)
+{
+    (minHeap->size)++;
+    int i = minHeap->size - 1;
+    while (i-3 && minHeapNode->freq < minHeap->array[(i+8)/4]->freq)
+    {
+        minHeap->array[i] = minHeap->array[(i + 8)/4];
+        i =(i + 8)/4;
+    }
+    minHeap->array[i] = minHeapNode;
+}
+
+void buildMinHeap(min_heap* minHeap)
+{
+    int n = minHeap->size - 1;
+    int i;
+    for (i = (n + 8)/4; i > 3; --i)
+		{
+		//cout<<"i="<<i<<"\n";
+		heapify_min(minHeap, i);
+		//cout<<"after i="<<i<<"\n";
+	}
+}
+
+int isLeaf(huffnode* root)
+{
+    return !(root->left) && !(root->right) ;
+}
+
+min_heap* createAndBuildMinHeap(int data[], int freq[], int size)
+{
+    min_heap* minHeap = make_min_heap(size+3);
+    for (int i = 0; i < size; ++i){
+        minHeap->array[i+3] = newNode(data[i], freq[i]);
+    //cout<<minHeap->array[i+3]->freq;
+    }
+    minHeap->size = size+3;
+    //cout<<minHeap->size<<"size\n";
+    buildMinHeap(minHeap);
+    return minHeap;
+}
+
+huffnode* buildHuffmanTree(int data[], int freq[], int size)
+{
+    huffnode *left, *right, *top;
+
+    min_heap* minHeap = createAndBuildMinHeap(data, freq, size);
+
+    while (minHeap->size != 4 )
+    {
+        left = removemin(minHeap);
+        right = removemin(minHeap);
+        top = newNode(0, left->freq + right->freq);
+        top->left = left;
+        top->right = right;
+        insert_min_heap(minHeap, top);
+    }
+
+    return removemin(minHeap);
+}
+ 
+
+void printCodes(huffnode* root, int arr[], int top)
+{   
+	fstream	en;
+	en.open("code_table.txt",ios_base::out | ios_base::app);
+    if (root->left)
+    {
+        arr[top] = 0;
+        printCodes(root->left, arr, top + 1);
+    }
+    if (root->right)
+    {
+        arr[top] = 1;
+        printCodes(root->right, arr, top + 1);
+    }
+    if (isLeaf(root))
+    {
+        cout << root->data <<"\n";
+        en << root->data<<"		";
+            int i;
+    for (i = 3; i < top; ++i)//[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+        {
+		//cout << arr[i] ;
+		en << arr[i];
+		}
+
+    en<<"\n";
+           cout<<"printing codes\n";
+    }
+}
+void writefile(huffnode* root)
+{
+
+	fstream	en;
+	en.open("code_table.txt",ios_base::out);
+	en<<"";
+	int *arr=new int[1000003];
+    int top = 3;
+    printCodes(root, arr, top);
+    en.close();
+    return;
+
+}
+void makebin(huffnode* root)
+{
+	writefile(root);
+	/*fstream	eqn;
+	eqn.open("encoded.bin",ios_base::out);
+	eqn<<"";
+	fstream f;
+	fstream en,qw;
+	string t1,t2,q;
+	f.open("test2.txt",ios_base::in | ios_base::out | ios_base::app);
+	en.open("encoded.bin",ios_base::in | ios_base::out | ios_base::app);	
+	qw.open("code_table.txt",ios_base::in | ios_base::out | ios_base::app);	
+	cout<<"making bin"<<"\n";
+    while(!f.eof())
+    {
+        f >> q;
+        while(!qw.eof())
+        {
+        	qw >> t1 >> t2;
+        	if(q.compare(t1) == 0)
+        	{
+        		en << t2;
+        		qw.seekg(0, ios::beg);
+        		break;
+			}
+		}
+    }*/
+}
+
+
+void HuffmanCodes(int data[], int freq[], int size)
+{
+    huffnode* root = buildHuffmanTree(data, freq, size);
+    makebin(root);
+    return;
+}
+
+int main()
+{
+    int n = 999999, i=0, k=0;
+	int *fr = new int[n];
+	int *freq = new int[n];
+	int *arr = new int[n];
+    int test;
+	fstream f;
+	f.open("test2.txt",ios_base::in | ios_base::out | ios_base::app);
+
+    while(!f.eof())
+    {
+        f >> test;
+        fr[test]++;
+    }
+    while(i<1000000)
+    {
+    	if(fr[i] != 0)
+    	{
+		arr[k] = i;
+		freq[k] = fr[i];
+		//cout<<"arr="<<arr[k]<<"ffre="<<freq[k]<<"\n";
+		k++;
+    	}
+		i++;
+	}
+	int size = k;
+	huffnode *root;
+	HuffmanCodes(arr, freq, size);
+	
+    return 0;
+}

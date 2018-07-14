@@ -1,0 +1,37 @@
+.\" Copyright (c) 2017 University of Florida.
+.\"
+.\"	@(#)get_tag.2	6.3 (Parth) 2017
+.\"
+.TH get_tag 2 "UF 2017"
+.SH NAME
+get_tag retrieves tag of a process
+.SH SYNOPSIS
+.nf
+.ft B
+#include <unistd.h>
+
+int get_tag(int PID); 
+.ft R
+.fi
+.SH DESCRIPTION
+The get_tag function reads the tag value of the process whose PID is passed
+into, given; the user is the root user or process is reading its own PID.
+Rest of users can not read any tag.
+The PID is the process ID of the process whose tag is to be 
+accessed.
+
+.RE
+.SH "RETURN VALUE
+A successful call to get_tag(P) that immediately follows a successful call 
+to set_tag(P,v) returns the value v (when the set_tag has changed  
+value of tag for process P to v). 
+Otherwise, a value of \-1 is returned to indicate the error.
+.SH ERRORS
+get_tag() call will fail if the process ID refers to an invalid PID or
+the PID must refer to a live process.
+get_tag() call will also fail if the value is negative or user is not root
+or user is not reading its own tag.  
+.SH "SEE ALSO"
+.BR set_tag (2)
+.SH AUTHOR
+Parth Sethi 

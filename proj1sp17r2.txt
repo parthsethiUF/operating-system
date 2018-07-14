@@ -1,0 +1,161 @@
+Project 1
+
+COP 4600 
+Spring 2017
+
+Due: Feb 4 (patch file, code, report on Canvas)
+Demo by signup on Doodle poll (see Canvas).
+
+Brief Description:
+Implement a new system call in Minix 3.2.1, along with two library functions 
+in the system library that allow it to be called from a C program. 
+We will provide a C program that exercises and demonstrates the new call. 
+Demonstrate the system call by building your modified Minix 3 with the new
+system call, compiling our demo program, then running the demo program on your 
+modified Minix 3 for the TA during the slot that you reserved. 
+Be prepared to discuss what you did, what problems you faced, how you solved
+them, what files you modified, and what you learned. 
+
+Details of System Call:
+You will first modify the process table to include a new integer value, 
+tag, initialized to zero.  
+The new system call will allow 
+(a) the value of tag to be read by any process with root access, 
+(b) the value of tag of any process to be read by itself (i.e., the PID
+	matches the PID of the calling process)
+(c) the value of tag to be written by any process with root access
+Comment: The tag will later be used in access control.
+
+Library procedures:
+You will also implement library procedures that can be referenced by 
+a C program to demonstrate the call. These must be included in the system
+library so that compiling a C program that references them will work (i.e., 
+the references to these calls will be resolved). 
+
+The library procedures will have prototypes
+int set_tag(int PID, int newvalue);
+int get_tag(int PID); 
+Both will return the value of tag, or an error number (negative). 
+
+The argument PID will be the process ID of the process whose tag is to be 
+accessed, and newvalue will be the new value of the non-negative tag. 
+A successful call to get_tag(P) that immediately follows a successful call 
+to set_tag(P,v) shall return the value v (i.e., the set_tag call shall 
+change the value of tag for process P to v, which shall be returned when
+get_tag is called). 
+
+Both the get_tag() and the set_tag() call shall fail if the process ID 
+refers to an invalid PID (either out of bounds or a process table entry 
+that is not in use); the PID must refer to a live process (in any state). 
+
+The set_tag() call shall also fail if the value is negative. 
+
+Failure shall be indicated by a return value of -1.
+
+Test program:
+We will supply a simple test program, but you may want to implement your
+own program(s) for testing. 
+Our test program must compile using the system library after you have
+modified your Minix VM. 
+
+Documentation:
+You will provide the following two documents. 
+
+man page - a manual page for your library procedures in man page format 
+(you may copy and modify an existing man page for this purpose). You must
+place the new man page in the proper location so that entering the command
+man set_tag or man get_tag return the man page for these calls. You may
+check environment variable MANPATH to see where the man pages are, and 
+type "man man" to see how the sections are arranged. You may combine both
+system library calls on one man page, but typing either "man set_tag" or
+"man get_tag" must display an appropriate man page. At a minimum, the man
+page must have proper header/footer, name, synopsis, description, and errors.
+A see-also part will be needed if you have separate man pages. 
+
+Report (may be pdf, doc, docx, or txt) - this document will explain how you 
+implemented the new system call, including what changes were made to which 
+files and why each change was made.  It will include description of how 
+testing was performed along with any known bugs.
+
+Submission:
+You will submit 
+- a patch file including all the changes made from a fresh installation 
+of Minix 3.2.1 to existing Minix files needed to support the new call 
+(note that this includes any changes to makefiles also). A set of patch
+files that are applied from the makefile is also OK. 
+- all new source files you created, along with any test files 
+- makefile to move files to the correct locations, apply patches, and 
+	recompile/relink/rebuild as needed
+- man page
+- report
+
+Applying the patches and remaking the necessary parts of Minix, then
+rebooting and typing "make test" in the directory with the test code
+should compile the test program and link in the new library object code. 
+Typing "man set_tag" should display the man page for set_tag, and typing
+"man get_tag" should display the man page for get_tag (these may both 
+display the same page if they have a combined man page). 
+
+Demonstration:
+You will sign up to demonstrate your code to a TA on the Doodle poll we will
+set up and make available on Canvas.  You will have 10 minutes to demo and to 
+answer questions.  Do not be late for your demo. Missed demo appointments will 
+deduct 3 points from your score for each missed appointment (late is defined 
+as 1 or more minutes late). 
+
+Helpful resources:
+The Minix3.org website has many helpful documents, and we will add documents 
+to the class website of a more specific nature. 
+
+Detailed Rubric
+Project 1:		
+Doc 10		
+	Report	
+	1	clear &	organized
+	1	files modified
+	1	What done
+	1	Why done
+	1	Testing
+	1	Bugs
+	Man page	
+	1	called from man
+	1	header, section
+	1	synopsis
+	1	description
+		
+Code 10		
+	1	structure
+	2	comments
+	2	identifiers
+	2	no manifest constants
+	1	easy to understand/maintain
+	2	patch file works correctly
+		
+Functionality 20		
+	*	build works
+	1	make test works
+	2	uses system library
+	set_tag	
+	2	own process can't change
+	2	other process can't change
+	2	root process can change
+	2	tag initialized to 0 for new process
+	1	PID out of range / not in use fails
+	1	negative tag fails
+	get_tag	
+	2	own process can read
+	2	other process can't read
+	2	root process can read
+	1	PID out of range / not in use fails
+		
+Demo 10		
+	2	Code explained
+	8	Questions answered well 
+
+Penalties
+	-1	point per day or partial day late
+	-3	points per missed/late show for demo
+	-3	points for reserving multiple demo slots
+	-20	if code does not compile and run properly
+	-50 and a trip to the Honor Court for sharing code
+

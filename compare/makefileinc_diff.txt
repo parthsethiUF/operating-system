@@ -1,0 +1,4 @@
+19c19
+< 	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c
+---
+> 	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c set_tag.c get_tag.c
